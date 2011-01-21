@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QuickBar Demo</title>
+
+    <style type="text/css">
+        body {
+            font-size: 12px;
+            font-family: sans-serif;
+        }
+        p {
+            text-align: center;
+            margin: 5em;
+        }
+
+        /* Quick Bar */
+        .quick-bar {
+            position: fixed;
+            top: 0;
+            left: 4px;
+            border: 1px solid #CCC;
+            border-top: 0;
+            background: #EEE;
+            padding: 0 12px;
+            line-height: 3em;
+            -webkit-box-shadow: 0 2px 6px #CCC;
+            -moz-box-shadow: 0 2px 6px #CCC;
+            box-shadow: 0 2px 6px #CCC;
+        }
+        .quick-bar label {
+            margin-right: .5em;
+        }
+        .quick-bar label .icon {
+            margin-right: 6px;
+            vertical-align: -7px;
+        }
+        .quick-bar input {
+            width: 300px;
+        }
+
+
+        /* Selection List Dropdown */
+        ul.selection-list {
+            position: absolute;
+            margin: 0;
+            padding: 0;
+            max-height: 200px;
+            overflow: auto;
+            overflow-x: hidden;
+            border: 1px solid #CCC;
+            background: #FFF;
+        }
+        ul.selection-list li {
+            margin: 0;
+            padding: 4px 8px 4px 40px;
+            border-bottom: 1px solid #CCC;
+            display: block;
+            list-style: none;
+            overflow: hidden;
+            white-space: nowrap;
+            line-height: 24px;
+        }
+        ul.selection-list li.highlight {
+            background: #EEE;
+        }
+        ul.selection-list .icon {
+            float: left;
+            margin-left: -32px;
+        }
+    </style>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type="text/javascript" src="../jquery.selectionList.js"></script>
+    <script type="text/javascript" src="../jquery.quickBar.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $.quickBar({
+                parent: 'body',
+                sources: [
+                    {
+                        type: 'local',
+                        commands: [{
+                            name: 'Google Search',
+                            aliases: ['Search', 'Find'],
+                            arg: true,
+                            icon: 'icons/search.png',
+                            action: {
+                                type: 'url',
+                                url: 'http://www.google.com/search?q={arg}'
+                            }
+                        }, {
+                            name: 'Logout',
+                            aliases: ['Sign Out'],
+                            icon: 'icons/logout.png',
+                            action: function() {
+                                // Invokes a click on the Logout button on the screen
+                                $('#logout').click();
+                            }
+                        }, {
+                            name: 'New Message',
+                            regexp: /^((new|create)\s+)?(e?mail|message)/i,
+                            arg: 'To',
+                            icon: 'icons/message.png',
+                            action: function(arg) {
+                                alert('This would open up an email form with the "To" field pre-populated with "' + arg + '".');
+                                /*
+                                $('#emailTo').val(arg);
+                                $('#email').show();
+                                $('#emailBody').focus();
+                                */
+                            }
+                        }, {
+                            name: 'Go To URL',
+                            aliases: ['Location'],
+                            arg: 'Location',
+                            argDefault: 'http://',
+                            icon: 'icons/arrow_right.png',
+                            action: {
+                                type: 'url',
+                                url: '{arg}'
+                            }
+                        }]
+                    },
+
+                    // This is an example of a command source that builds its commands dynamically from the links on the page.
+                    {
+                        type: 'local',
+                        commands: (function() {
+                            var commands = [],
+                                    links = $('#links a');
+
+                            links.each(function() {
+                                commands.push({
+                                    name: $(this).text(),
+                                    icon: 'icons/link.png',
+                                    action: {
+                                        type: 'url',
+                                        url: this.href
+                                    }
+                                });
+                            });
+
+                            return commands;
+                        })()
+                    }
+
+                    /* For the future...
+                    {
+                        type: 'ajax',
+                        url: '/commands.php',
+                        dataType: 'json',
+                        paramName: 'search'
+                    }, {
+                        type: 'ajax',
+                        url: '/commands-xml.php',
+                        dataType: 'xml',
+                        processXhrData: function(data) {
+                            var commands = [],
+                                commandEls = data.getElementsByTagName('command'),
+                                el;
+                            for(var i=0, len=commandEls.length; i < len; i++) {
+                                el = commandEls[i];
+                                commands.push({
+                                    name: el.getAttribute("name")
+
+                                });
+                            }
+                            return commands;
+                        }
+                    } */
+                ],
+
+                // By default show/hide have no animation; override to add a slide effect:
+                showFn: function(box) {
+                    box.slideDown(100);
+                },
+                hideFn: function(box) {
+                    box.slideUp(100);
+                }
+            });
+        });
+    </script>
+
+</head>
+<body>
+
+    <p>This is a demo page for QuickBar. The default launch keystroke is <kbd>Ctrl+Shift+Space</kbd>.</p>
+
+    <ul id="links" style="position:absolute;right:1em;bottom:4em;">
+        <li><a href="quickBar.demo.html#one">Link One</a></li>
+        <li><a href="quickBar.demo.html#two">Link Two</a></li>
+        <li><a href="quickBar.demo.html#three">Link Three</a></li>
+        <li><a href="quickBar.demo.html#four">Link Four</a></li>
+        <li><a href="quickBar.demo.html#five">Link Five</a></li>
+    </ul>
+
+    <button id="logout" onclick="alert('dummy logout button clicked');" style="position:absolute;bottom:1em;right:1em;width:20em;">Dummy Logout Button</button>
+
+</body>
+</html>
